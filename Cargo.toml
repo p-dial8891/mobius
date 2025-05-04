@@ -1,0 +1,33 @@
+[package]
+name = "mobius"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0"
+futures = "0.3"
+tarpc = { version = "0.36", features = ["full"] }
+tokio = { version = "1.0", features = ["rt-multi-thread", "macros", "net"] }
+
+clap = { version = "4.4.18", features = ["derive"] }
+log = "0.4"
+opentelemetry = { version = "0.26.0" }
+opentelemetry-otlp = "0.26.0"
+tracing = { version = "0.1" }
+tracing-opentelemetry = "0.27.0"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+opentelemetry_sdk = { version = "0.26.0", features = ["rt-tokio"] }
+opentelemetry-semantic-conventions = "0.16.0"
+rand = "0.8"
+
+[lib]
+name = "service"
+path = "src/lib.rs"
+
+[[bin]]
+name = "server"
+path = "src/server.rs"
+
+[[bin]]
+name = "client"
+path = "src/client.rs"
