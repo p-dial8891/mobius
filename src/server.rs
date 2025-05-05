@@ -43,16 +43,18 @@ impl Mobius for MobiusServer {
         let sleep_time =
             Duration::from_millis(Uniform::new_inclusive(1, 10).sample(&mut thread_rng()));
         time::sleep(sleep_time).await;
-        let mut file = File::open("/dev/hidg0").await.unwrap();
-		file.write_all(vec!(0,0,23,0,0,0,0,0).as_slice()).await;
+        let mut file = File::create("/dev/hidg0").await.unwrap();
+		file.write_all(vec!(0,0,0,4,0,0,0,0).as_slice()).await;
+		file.write_all(vec!(0,0,0,0,0,0,0,0).as_slice()).await;
 		String::new()
     }
     async fn password(self, _: context::Context, secret: String, id: String) -> String {
         let sleep_time =
             Duration::from_millis(Uniform::new_inclusive(1, 10).sample(&mut thread_rng()));
         time::sleep(sleep_time).await;
-        let mut file = File::open("/dev/hidg0").await.unwrap();
-		file.write_all(vec!(0,0,47,0,0,0,0,0).as_slice()).await;
+        let mut file = File::create("/dev/hidg0").await.unwrap();
+		file.write_all(vec!(0,0,0,5,0,0,0,0).as_slice()).await;
+		file.write_all(vec!(0,0,0,0,0,0,0,0).as_slice()).await;
 		String::new()
 	}
 }
