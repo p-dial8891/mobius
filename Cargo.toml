@@ -47,3 +47,7 @@ path = "src/client.rs"
 [[bin]]
 name = "key_capture"
 path = "src/key_capture.rs"
+
+[[bin]]
+name = "encrypt"
+path = "src/encrypt.rs"

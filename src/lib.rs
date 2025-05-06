@@ -4,6 +4,7 @@
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
+use std::io::Error;
 use opentelemetry::trace::TracerProvider as _;
 use tracing_subscriber::{fmt::format::FmtSpan, prelude::*};
 
