@@ -4,21 +4,21 @@
 // license that can be found in the LICENSE file or at
 // https://opensource.org/licenses/MIT.
 
-use std::io::Error;
 use clap::Parser;
 use futures::{future, prelude::*};
 use rand::{
     distributions::{Distribution, Uniform},
     thread_rng,
 };
-use service::{init_tracing, Mobius};
+use service::{Mobius, init_tracing};
+use std::io::Error;
 use std::{
     net::{IpAddr, Ipv4Addr, SocketAddr},
     time::Duration,
 };
 use tarpc::{
     context,
-    server::{self, incoming::Incoming, Channel},
+    server::{self, Channel, incoming::Incoming},
     tokio_serde::formats::Json,
 };
 use tokio::time;
@@ -30,15 +30,15 @@ use tokio::io::AsyncWriteExt;
 use simple_crypt::decrypt;
 use std::path::Path;
 
+use serde_json::{Result, Value};
 use std::error::Error as OtherError;
 use std::io::BufReader;
-use serde_json::{Result, Value};
 
 #[derive(Parser)]
 struct Flags {
-	/// Sets the secret key to use
-	#[clap(long)]
-	secret: String,
+    /// Sets the secret key to use
+    #[clap(long)]
+    secret: String,
     /// Sets the port number to listen on.
     #[clap(long)]
     port: u16,
@@ -55,39 +55,41 @@ impl Mobius for MobiusServer {
             Duration::from_millis(Uniform::new_inclusive(1, 10).sample(&mut thread_rng()));
         time::sleep(sleep_time).await;
         let mut gadgetFIle = File::create("/dev/hidg0").await.unwrap();
-		if secret == self.2 {
-			for c in self.1[id][0].as_str().expect("Unknown JSON id").chars()
-			{
-				let cx = (c as u8) - ('a' as u8) + 4;
-                gadgetFIle.write_all(vec!(0,0,0,cx,0,0,0,0).as_slice()).await;
-			    gadgetFIle.write_all(vec!(0,0,0,0,0,0,0,0).as_slice()).await;
-			}  
-		}
-		else
-		{
-			tracing::info!("Wrong secret key.");
-		}
-		String::new()
+        if secret == self.2 {
+            for c in self.1[id][0].as_str().expect("Unknown JSON id").chars() {
+                let cx = (c as u8) - ('a' as u8) + 4;
+                gadgetFIle
+                    .write_all(vec![0, 0, 0, cx, 0, 0, 0, 0].as_slice())
+                    .await;
+                gadgetFIle
+                    .write_all(vec![0, 0, 0, 0, 0, 0, 0, 0].as_slice())
+                    .await;
+            }
+        } else {
+            tracing::info!("Wrong secret key.");
+        }
+        String::new()
     }
     async fn password(self, _: context::Context, secret: String, id: String) -> String {
         let sleep_time =
             Duration::from_millis(Uniform::new_inclusive(1, 10).sample(&mut thread_rng()));
         time::sleep(sleep_time).await;
         let mut gadgetFIle = File::create("/dev/hidg0").await.unwrap();
-		if secret == self.2 {
-			for c in self.1[id][2].as_str().expect("Unknown JSON id").chars()
-			{
-				let cx = (c as u8) - ('a' as u8) + 4;
-                gadgetFIle.write_all(vec!(0,0,0,cx,0,0,0,0).as_slice()).await;
-			    gadgetFIle.write_all(vec!(0,0,0,0,0,0,0,0).as_slice()).await;
-			}  
-		}
-		else
-		{
-			tracing::info!("Wrong secret key.");
-		}
-		String::new()
-	}
+        if secret == self.2 {
+            for c in self.1[id][2].as_str().expect("Unknown JSON id").chars() {
+                let cx = (c as u8) - ('a' as u8) + 4;
+                gadgetFIle
+                    .write_all(vec![0, 0, 0, cx, 0, 0, 0, 0].as_slice())
+                    .await;
+                gadgetFIle
+                    .write_all(vec![0, 0, 0, 0, 0, 0, 0, 0].as_slice())
+                    .await;
+            }
+        } else {
+            tracing::info!("Wrong secret key.");
+        }
+        String::new()
+    }
 }
 
 async fn spawn(fut: impl Future<Output = ()> + Send + 'static) {
@@ -98,12 +100,14 @@ async fn spawn(fut: impl Future<Output = ()> + Send + 'static) {
 async fn main() -> anyhow::Result<()> {
     let flags = Flags::parse();
     init_tracing("Tarpc Example Server")?;
-	println!("Tarpc Example Server");
+    println!("Tarpc Example Server");
 
     // Open the file in read-only mode with buffer.
-    let contents = fs::read_to_string("input.json").await.expect("Unable to open JSON file.");
-	//let contents = decrypt(&encrypted, flags.secret.as_bytes())
-	//.expect("Failed to decrypt the file");
+    let contents = fs::read_to_string("input.json")
+        .await
+        .expect("Unable to open JSON file.");
+    //let contents = decrypt(&encrypted, flags.secret.as_bytes())
+    //.expect("Failed to decrypt the file");
     // Read the JSON contents of the file as an instance of `User`.
     let server_addr = (IpAddr::V4(Ipv4Addr::new(169, 254, 24, 24)), flags.port);
 
@@ -111,7 +115,7 @@ async fn main() -> anyhow::Result<()> {
     // to start up a serde-powered json serialization strategy over TCP.
     let mut listener = tarpc::serde_transport::tcp::listen(&server_addr, Json::default).await?;
     tracing::info!("Listening on port {}", listener.local_addr().port());
-	println!("Listening on port {}", listener.local_addr().port());
+    println!("Listening on port {}", listener.local_addr().port());
     listener.config_mut().max_frame_length(usize::MAX);
     listener
         // Ignore accept errors.
@@ -123,10 +127,13 @@ async fn main() -> anyhow::Result<()> {
         // the generated World trait.
         .map(|channel| {
             let v: Value = serde_json::from_str(contents.as_str()).expect("Unable to parse JSON");
-            let server = MobiusServer(channel.transport().peer_addr().unwrap(), v.clone(), 
-			flags.secret.clone());
+            let server = MobiusServer(
+                channel.transport().peer_addr().unwrap(),
+                v.clone(),
+                flags.secret.clone(),
+            );
             channel.execute(server.serve()).for_each(spawn)
-			//fs::remove_file("input.json")
+            //fs::remove_file("input.json")
         })
         // Max 10 channels.
         .buffer_unordered(10)
