@@ -34,150 +34,147 @@ use serde_json::{Result, Value};
 use std::error::Error as OtherError;
 use std::io::BufReader;
 
+fn get_key_codes(c: char) -> (bool, u8) {
+    let capital = c.is_ascii_uppercase();
+    match c.to_ascii_lowercase() {
+        'a' => (capital, 4),
 
-fn get_key_codes( c : char ) -> ( bool, u8 )
-{
-	let capital = c.is_ascii_uppercase();
-	match c.to_ascii_lowercase() {
-		
-	'a'    => (capital,  4),
-	
-	'b'    => (capital,  5),
+        'b' => (capital, 5),
 
-	'c'    => (capital,  6),
-	
-	'd'    => (capital,  7),
+        'c' => (capital, 6),
 
-	'e'    => (capital,  8),
-	
-	'f'    => (capital,  9),
+        'd' => (capital, 7),
 
-	'g'    => (capital, 10),
-	
-	'h'    => (capital, 11),
-	
-	'i'    => (capital, 12),
-	
-	'j'    => (capital, 13),
-	
-	'k'    => (capital, 14),
-	
-	'l'    => (capital, 15),
-	
-	'm'    => (capital, 16),
-	
-	'n'    => (capital, 17),
-	
-	'o'    => (capital, 18),
-	
-	'p'    => (capital, 19),
+        'e' => (capital, 8),
 
-	'q'    => (capital, 20),
+        'f' => (capital, 9),
 
-	'r'    => (capital, 21),
-	
-	's'    => (capital, 22),
-	
-	't'    => (capital, 23),
-	
-	'u'    => (capital, 24),
+        'g' => (capital, 10),
 
-	'v'    => (capital, 25),
-	
-	'w'    => (capital, 26),
-	
-	'x'    => (capital, 27),
-	
-	'y'    => (capital, 28),
+        'h' => (capital, 11),
 
-	'z'    => (capital, 29),
+        'i' => (capital, 12),
 
-	'0'    => (capital, 30),
+        'j' => (capital, 13),
 
-	')'    => (true,    39),
-	
-	'1'    => (false,   30),
-	
-	'!'    => (true,    30),
-	
-	'2'    => (false,   31),
-	
-	'@'    => (true,    31),
+        'k' => (capital, 14),
 
-	'3'    => (false,   32),
-	
-	'#'    => (true,    32),
+        'l' => (capital, 15),
 
-	'4'    => (false,   33),
+        'm' => (capital, 16),
 
-	'$'    => (true,    33),
-	
-	'5'    => (false,   34),
+        'n' => (capital, 17),
 
-	'%'    => (true,    34),
+        'o' => (capital, 18),
 
-	'6'    => (false,   35),
-	
-	'^'    => (true,    35),
+        'p' => (capital, 19),
 
-	'7'    => (false,   36),
-	
-	'&'    => (true,    36),
+        'q' => (capital, 20),
 
-	'8'    => (false,   37),
-	
-	'*'    => (true,    37),
+        'r' => (capital, 21),
 
-	'9'    => (false,   38),
+        's' => (capital, 22),
 
-	'('    => (true,    38),
-	
-	'-'    => (false,   45),
+        't' => (capital, 23),
 
-	'_'    => (true,    45),
+        'u' => (capital, 24),
 
-	'='    => (false,   46),
+        'v' => (capital, 25),
 
-	'+'    => (true,    46),
+        'w' => (capital, 26),
 
-	'['    => (false,   47),
-	
-	'{'    => (true,    47),
-	
-	']'    => (false,   48),
+        'x' => (capital, 27),
 
-	'}'    => (true,    48),
+        'y' => (capital, 28),
 
-	'\''   => (false,   49),
+        'z' => (capital, 29),
 
-	'|'    => (true,    49),
+        '0' => (capital, 30),
 
-	';'    => (false,   51),
-	
-	':'    => (true,    51),
+        ')' => (true, 39),
 
-	'\''   => (false,   52),
+        '1' => (false, 30),
 
-	'"'    => (true,    52),
-	
-	'`'    => (false,   53),
+        '!' => (true, 30),
 
-	'~'    => (true,    53),
+        '2' => (false, 31),
 
-	','    => (false,   54),
+        '@' => (true, 31),
 
-	'<'    => (true,    54),
+        '3' => (false, 32),
 
-	'.'    => (false,   55),
-	
-	'>'    => (true,    55),
-	
-	'/'    => (false,   56),
+        '#' => (true, 32),
 
-	'?'    => (true,    56),
-	
-	 _     => (true,    56)
-	}
+        '4' => (false, 33),
+
+        '$' => (true, 33),
+
+        '5' => (false, 34),
+
+        '%' => (true, 34),
+
+        '6' => (false, 35),
+
+        '^' => (true, 35),
+
+        '7' => (false, 36),
+
+        '&' => (true, 36),
+
+        '8' => (false, 37),
+
+        '*' => (true, 37),
+
+        '9' => (false, 38),
+
+        '(' => (true, 38),
+
+        '-' => (false, 45),
+
+        '_' => (true, 45),
+
+        '=' => (false, 46),
+
+        '+' => (true, 46),
+
+        '[' => (false, 47),
+
+        '{' => (true, 47),
+
+        ']' => (false, 48),
+
+        '}' => (true, 48),
+
+        '\'' => (false, 49),
+
+        '|' => (true, 49),
+
+        ';' => (false, 51),
+
+        ':' => (true, 51),
+
+        '\'' => (false, 52),
+
+        '"' => (true, 52),
+
+        '`' => (false, 53),
+
+        '~' => (true, 53),
+
+        ',' => (false, 54),
+
+        '<' => (true, 54),
+
+        '.' => (false, 55),
+
+        '>' => (true, 55),
+
+        '/' => (false, 56),
+
+        '?' => (true, 56),
+
+        _ => (true, 56),
+    }
 }
 
 #[derive(Parser)]
@@ -205,7 +202,7 @@ impl Mobius for MobiusServer {
             for c in self.1[id][0].as_str().expect("Unknown JSON id").chars() {
                 let cx = get_key_codes(c);
                 gadgetFIle
-                    .write_all(vec![if cx.0 {2} else {0}, 0, 0, cx.1, 0, 0, 0, 0].as_slice())
+                    .write_all(vec![if cx.0 { 2 } else { 0 }, 0, 0, cx.1, 0, 0, 0, 0].as_slice())
                     .await;
                 gadgetFIle
                     .write_all(vec![0, 0, 0, 0, 0, 0, 0, 0].as_slice())
@@ -225,7 +222,7 @@ impl Mobius for MobiusServer {
             for c in self.1[id][2].as_str().expect("Unknown JSON id").chars() {
                 let cx = get_key_codes(c);
                 gadgetFIle
-                    .write_all(vec![if cx.0 {2} else {0}, 0, 0, cx.1, 0, 0, 0, 0].as_slice())
+                    .write_all(vec![if cx.0 { 2 } else { 0 }, 0, 0, cx.1, 0, 0, 0, 0].as_slice())
                     .await;
                 gadgetFIle
                     .write_all(vec![0, 0, 0, 0, 0, 0, 0, 0].as_slice())
@@ -241,7 +238,6 @@ impl Mobius for MobiusServer {
 async fn spawn(fut: impl Future<Output = ()> + Send + 'static) {
     tokio::spawn(fut);
 }
-
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
