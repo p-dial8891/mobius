@@ -7,11 +7,11 @@ The software is composed of two components - server and client. The server runs 
 The user credentials are stored on the raspberry pi under the name "input.json" and is not encrypted. In upcoming updates, it is planned to store the file on an encrypted partition.
 
 ## Usage
-Server:
-sudo server --secret MasterPassword --port 50051
+Server:  
+`sudo server --secret MasterPassword --port 50051`
 
-Client:
-client.exe --server-addr 169.254.24.24:50051 --secret MasterPassword --id Website99
+Client:  
+`client.exe --server-addr 169.254.24.24:50051 --secret MasterPassword --id Website99`
 
-The server-addr is optional and will default to the above if not specified.
+The server-addr is optional and will default to the above if not specified. The secret and id above are examples and should correspond to the user's application.
 
