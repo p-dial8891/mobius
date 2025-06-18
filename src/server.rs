@@ -89,7 +89,7 @@ fn get_key_codes(c: char) -> (bool, u8) {
 
         'z' => (capital, 29),
 
-        '0' => (capital, 30),
+        '0' => (capital, 39),
 
         ')' => (true, 39),
 
@@ -246,7 +246,7 @@ async fn main() -> anyhow::Result<()> {
     println!("Tarpc Example Server");
 
     // Open the file in read-only mode with buffer.
-    let contents = fs::read_to_string("input.json")
+    let contents = fs::read_to_string("/mnt/ws/input.json")
         .await
         .expect("Unable to open JSON file.");
     //let contents = decrypt(&encrypted, flags.secret.as_bytes())
