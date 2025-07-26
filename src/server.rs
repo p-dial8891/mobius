@@ -129,6 +129,8 @@ fn get_key_codes(c: char) -> (bool, u8) {
 
         '(' => (true, 38),
 
+        ' ' => (false, 44),
+
         '-' => (false, 45),
 
         '_' => (true, 45),
@@ -145,7 +147,7 @@ fn get_key_codes(c: char) -> (bool, u8) {
 
         '}' => (true, 48),
 
-        '\'' => (false, 49),
+        '\\' => (false, 49),
 
         '|' => (true, 49),
 
